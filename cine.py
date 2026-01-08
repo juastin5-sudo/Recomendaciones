@@ -205,10 +205,9 @@ if resultados:
     for i, item in enumerate(resultados[:12]):
         with cols[i % 4]:
             tit_i = item.get('title') or item.get('name')
-            # Recuperamos trailer, proveedores únicos y el link directo
             tra, provs, link_p = obtener_detalles_completos(item['id'], t_api, tit_i)
             
-            # --- IMAGEN CLICABLE (Póster) ---
+            # 1. IMAGEN CLICABLE
             if item.get('poster_path'):
                 st.markdown(f'''
                     <a href="{link_p}" target="_blank">
@@ -219,7 +218,7 @@ if resultados:
             with st.container(height=380, border=False):
                 st.markdown(f"**{tit_i}**")
                 
-                # Botón de favoritos (se mantiene igual)
+                # Favoritos
                 if st.session_state.usuario:
                     es_f = any(f['id'] == item['id'] for f in st.session_state.favoritos)
                     if st.button("❤️" if es_f else "🤍", key=f"f_{item['id']}"):
@@ -227,28 +226,28 @@ if resultados:
                         else: st.session_state.favoritos.append(item)
                         st.rerun()
                 
-                # --- ICONOS DE PLATAFORMAS (Clicables y sin repetir) ---
+                # 2. ICONOS DE PLATAFORMAS (Clicables)
                 if provs:
                     h_p = '<div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px;">'
                     for p in provs[:4]:
                         h_p += f'''
                             <a href="{link_p}" target="_blank">
-                                <img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;" title="{p["provider_name"]}">
+                                <img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;">
                             </a>'''
                     h_p += '</div>'
                     st.markdown(h_p, unsafe_allow_html=True)
                 
-                # --- TU RESUMEN RECUPERADO ---
-                resumen = item.get('overview', 'Sin descripción disponible.')
-                st.markdown(f'<div class="resumen-inferior">{resumen}</div>', unsafe_allow_html=True)
+                # 3. VALORACIÓN
+                st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
 
-                # --- TRÁILER ---
+                # 4. BOTÓN VER TRÁILER
                 if tra:
                     with st.expander("VER TRÁILER"):
                         st.video(tra)
                 
-                # --- VALORACIÓN ---
-                st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
+                # 5. RESUMEN (Al final de todo)
+                resumen = item.get
+
 
 
 
