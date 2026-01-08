@@ -91,27 +91,31 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
     try:
         res = requests.get(url, params=params).json()
         
-        # Trailer
+        # 1. Trailer
         trailer = None
         for v in res.get('videos', {}).get('results', []):
             if v['type'] in ['Trailer', 'Opening'] and v['site'] == 'YouTube':
                 trailer = f"https://www.youtube.com/watch?v={v['key']}"
                 break
         
-        # Plataformas Únicas y Enlace Directo
+        # 2. Filtrar solo plataformas Premium
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
-        vistos = set()
-        providers_unicos = []
-        for p in providers:
-            if p['provider_name'] not in vistos:
-                providers_unicos.append(p)
-                vistos.add(p['provider_name'])
         
-        link_ver = region.get('link') if providers else f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
+        # Lista de IDs o nombres que quieres mostrar (Premium)
+        premium_names = ["Netflix", "Disney Plus", "HBO Max", "Amazon Prime Video", "Apple TV Plus", "Crunchyroll"]
+        providers_premium = [p for p in providers if p['provider_name'] in premium_names]
         
-        return trailer, providers_unicos, link_ver
-    except: return None, [], f"https://www.google.com/search?q={titulo_item}"
+        # 3. LINK DIRECTO: Si hay proveedores, intentamos ir a la búsqueda directa de la plataforma
+        if providers_premium:
+            plataforma = providers_premium[0]['provider_name']
+            link_ver = f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+en+{plataforma.replace(' ', '+')}"
+        else:
+            link_ver = f"https://www.google.com/search?q=donde+ver+{titulo_item.replace(' ', '+')}+online"
+            
+        return trailer, providers_premium, link_ver
+    except: 
+        return None, [], f"https://www.google.com/search?q={titulo_item}"
 
 # --- LÓGICA DE SESIÓN ---
 if 'usuario' not in st.session_state: st.session_state.usuario = None
@@ -248,6 +252,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
