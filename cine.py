@@ -59,6 +59,9 @@ IMAGE_URL = "https://image.tmdb.org/t/p/original"
 POSTER_URL = "https://image.tmdb.org/t/p/w500"
 LOGO_URL = "https://image.tmdb.org/t/p/original"
 
+# Lista de IDs de proveedores considerados "Premium"
+PREMIUM_PROVIDERS = [8, 337, 1899, 119, 283, 350, 15, 2, 384] # Netflix, Disney+, HBO, Amazon, Crunchyroll, Apple TV, Movistar, etc.
+
 def obtener_detalles_completos(item_id, tipo, titulo_item):
     params = {"api_key": API_KEY, "language": "es-ES", "append_to_response": "videos,watch/providers"}
     url = f"{BASE_URL}/{tipo}/{item_id}"
@@ -72,15 +75,19 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
         
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
+        
         vistos = set()
-        providers_unicos = []
+        providers_premium = []
         for p in providers:
-            if p['provider_name'] not in vistos:
-                providers_unicos.append(p)
+            # Filtramos para que solo incluya los IDs de la lista Premium
+            if p['provider_id'] in PREMIUM_PROVIDERS and p['provider_name'] not in vistos:
+                providers_premium.append(p)
                 vistos.add(p['provider_name'])
         
+        # El link_ver ahora prioriza el enlace directo de la plataforma si existe
         link_ver = region.get('link') if providers else f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
-        return trailer, providers_unicos, link_ver
+        
+        return trailer, providers_premium, link_ver
     except:
         return None, [], f"https://www.google.com/search?q={titulo_item}"
 
@@ -205,7 +212,9 @@ if resultados:
                 
                 if provs:
                     h_p = '<div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px;">'
-                    for p in provs[:4]: h_p += f'<img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;">'
+                    for p in provs[:4]: 
+                        # Los logos también llevan al link de la plataforma
+                        h_p += f'<a href="{link_p}" target="_blank"><img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;"></a>'
                     st.markdown(h_p + '</div>', unsafe_allow_html=True)
                 
                 if tra:
@@ -213,3 +222,5 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+                st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
