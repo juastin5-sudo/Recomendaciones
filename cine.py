@@ -13,10 +13,8 @@ st.set_page_config(
 
 st.markdown("""
 <style>
-    /* 1. Importar la fuente para que cargue el icono y no el texto */
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-    /* 2. Arreglar el botón de la barra lateral */
     [data-testid="stSidebarCollapsedControl"] {
         font-family: 'Material Icons' !important;
         background-color: #E50914 !important;
@@ -24,12 +22,10 @@ st.markdown("""
         border-radius: 0 10px 10px 0 !important;
     }
 
-    /* 3. Forzamos que SOLO tu texto sea visible y limpio */
     [data-testid="stExpanderIcon"], .stExpander svg {
         display: none !important;
     }
 
-    /* 4. Forzar tipografía Sans Serif */
     html, body, [class*="st-"] {
         font-family: sans-serif !important;
     }
@@ -275,6 +271,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
