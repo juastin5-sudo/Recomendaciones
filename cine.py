@@ -17,45 +17,56 @@ st.markdown("""
         html, body, [class*="st-"] { font-family: sans-serif !important; }
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
-      /* 1. ELIMINAR EL TEXTO DEL ERROR EN TODA LA APP */
-        [data-testid="stIconMaterial"] {
+     /* 1. ELIMINAR EL TEXTO DE ERROR SIN TOCAR BOTONES DE LOGIN */
+        /* Ocultamos específicamente el texto del icono pero permitimos que los botones respiren */
+        span[data-testid="stIconMaterial"] {
+            font-size: 0 !important;
             display: none !important;
         }
 
-        /* 2. LIMPIAR EL EXPANDER (Sin cajas dobles ni colores neón) */
+        /* 2. ESTILO PARA EL BOTÓN DE TRÁILER (Expander en la cartelera) */
         div[data-testid="stExpander"] {
-            border: none !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+            border-radius: 5px !important;
             background: transparent !important;
-            box-shadow: none !important;
         }
 
         div[data-testid="stExpander"] details summary {
             display: flex !important;
-            align-items: center;
             list-style: none !important;
-            font-size: 0 !important; /* Mata el texto "keyboard_arrow" */
+            font-size: 0 !important; 
+            padding: 5px 10px !important;
         }
 
-        /* 3. PONER UNA FLECHA SIMPLE (Como pediste) */
-        div[data-testid="stExpander"] details summary::after {
-            content: " ▼"; /* Una flecha de texto estándar */
-            font-size: 12px !important;
-            color: #bbbbbb;
-            margin-left: auto;
-        }
-
-        /* 4. TEXTO DEL BOTÓN */
         div[data-testid="stExpander"] details summary p {
             font-size: 14px !important;
             color: white !important;
             margin: 0 !important;
+            flex-grow: 1;
         }
 
-        /* 5. RESTAURAR BOTONES DE LOGIN (Sidebar) */
-        .stSidebar [data-testid="stBaseButton-secondary"] {
-            display: inline-flex !important;
-            background-color: #E50914 !important;
+        /* La flecha simple que pediste (▼) solo para el tráiler */
+        div[data-testid="stExpander"] details summary::after {
+            content: "▼";
+            font-size: 10px;
+            color: #888;
         }
+
+        /* 3. FORZAR VISIBILIDAD DE BOTONES EN LA SIDEBAR (LOGIN / REGISTRO) */
+        /* Esto hace que el botón de "Iniciar Sesión" sea siempre visible */
+        section[data-testid="stSidebar"] button {
+            display: flex !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            background-color: #E50914 !important; /* Rojo original */
+            color: white !important;
+            width: 100% !important;
+            height: auto !important;
+        }
+
+        /* 4. LIMPIEZA DE FLECHAS NATIVAS QUE DAN ERROR */
+        div[data-testid="stExpander"] svg { display: none !important; }
+        summary::-webkit-details-marker { display: none !important; }
         
         /* Ajuste de Botones y Cartelera */
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
@@ -227,6 +238,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
