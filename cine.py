@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 import streamlit.components.v1 as components
 
-# 1. Configuración de la página: Oculta la barra lateral al inicio
+# 1. Ocultar barra lateral por defecto y configurar página
 st.set_page_config(
     page_title="Juastin Stream Pro", 
     page_icon="🎬", 
@@ -12,14 +12,19 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Bloque de CSS para arreglar la letra, ocultar errores y estilizar el botón lateral
+# 2. CSS para limpiar errores visuales, tipografía y estilo del botón lateral
 st.markdown("""
 <style>
-   
+    /* Tipografía Sans Serif limpia para toda la app */
+    html, body, [class*="st-"], .stMarkdown {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+
     /* ELIMINAR EL ERROR 'keyboard_arrow' DEFINITIVAMENTE */
     summary svg, 
     span[data-testid="stExpanderIcon"], 
-    .stExpander svg {
+    .stExpander svg,
+    [data-testid="stExpanderIcon"] {
         display: none !important;
     }
     
@@ -28,11 +33,10 @@ st.markdown("""
         background-color: rgba(229, 9, 20, 0.9); /* Rojo Netflix */
         border-radius: 0 10px 10px 0;
         color: white;
-        padding: 5px;
         top: 10px;
     }
 
-    /* Ajuste para que los botones de trailer no se vean amontonados */
+    /* Ajuste para los contenedores de tráiler */
     .stExpander {
         border: 1px solid rgba(255,255,255,0.1) !important;
         border-radius: 10px !important;
@@ -280,6 +284,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
