@@ -10,22 +10,24 @@ st.set_page_config(page_title="Juastin Stream Pro", page_icon="🎬", layout="wi
 # --- CONEXIÓN A BASE DE DATOS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- ESTILOS CSS (LIMPIEZA TOTAL DE ERRORES) ---
+# --- ESTILOS CSS (ELIMINACIÓN RADICAL DE ERRORES) ---
 st.markdown("""
     <style>
+        /* Tipografía Sans Serif Original */
         html, body, [class*="st-"] { font-family: sans-serif !important; }
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
-        /* OCULTAR ERROR KEYBOARD_ARROW DEFINITIVAMENTE */
-        span[data-testid="stExpanderIcon"] { display: none !important; }
-        .stExpander svg { display: none !important; }
-        .stExpander { border: 1px solid rgba(255,255,255,0.1) !important; border-radius: 10px !important; }
-
-        .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
+        /* ELIMINAR KEYBOARD_ARROW Y ICONOS DEL EXPANDER POR COMPLETO */
+        div[data-testid="stExpander"] details summary svg { display: none !important; }
+        div[data-testid="stExpander"] details summary p { color: white !important; font-weight: bold !important; }
+        div[data-testid="stExpander"] details summary { list-style: none !important; }
+        div[data-testid="stExpander"] details summary::-webkit-details-marker { display: none !important; }
         
+        /* Ajuste de Botones y Cartelera */
+        .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
         div.stForm submit_button > button { 
             background-color: #E50914 !important; color: white !important; 
-            font-weight: bold !important; border: none !important; width: 100%;
+            font-weight: bold !important; border: none !important; width: 100%; 
         }
 
         .valoracion-container { 
@@ -60,11 +62,9 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
                 trailer = f"https://www.youtube.com/watch?v={v['key']}"
                 break
         
-        # --- ENLACES DIRECTOS A PLATAFORMAS (RESTAURADO) ---
+        # Plataformas Únicas y Enlace Directo
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
-        
-        # Filtrar duplicados
         vistos = set()
         providers_unicos = []
         for p in providers:
@@ -72,7 +72,6 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
                 providers_unicos.append(p)
                 vistos.add(p['provider_name'])
         
-        # Si hay plataforma, usamos su link, si no, Google
         link_ver = region.get('link') if providers else f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
         
         return trailer, providers_unicos, link_ver
@@ -109,21 +108,29 @@ with st.sidebar:
         st.success(f"Hola, {st.session_state.usuario.capitalize()}")
         if st.button("Cerrar Sesión"): st.session_state.usuario = None; st.rerun()
 
-    # Filtros originales
+    st.markdown("---")
+    # FILTROS RESTAURADOS COMPLETAMENTE
     if st.session_state.usuario:
-        with st.form("filtros"):
-            solo_f = st.checkbox("❤️ Mis Favoritos")
-            t_sel = st.radio("Ver:", ["Películas", "Series"])
+        with st.form("filtros_completos"):
+            solo_f = st.checkbox("❤️ Ver mis Favoritos")
+            t_sel = st.radio("Contenido:", ["Películas", "Series"])
             t_api = "movie" if t_sel == "Películas" else "tv"
+            
             st.write("#### 🍳 Menú")
             m_d = {"☕ Desayuno": "28,12", "🍲 Almuerzo": "99,18", "🍰 Merienda": "35,10751", "🌙 Cena": "53,80"}
             m_s = [m_d[m] for m in m_d if st.checkbox(m)]
+            
             st.write("#### 🎭 Humor")
-            h_d = {"😂 Reír": "35", "😱 Tensión": "53,27", "🎭 Drama": "18"}
+            h_d = {"😂 Reír": "35", "😱 Tensión": "53,27", "🎭 Drama": "18", "🚀 Futuro": "878"}
             h_s = [h_d[h] for h in h_d if st.checkbox(h)]
+
+            st.write("#### 📺 Plataformas")
+            p_d = {"Netflix": 8, "Disney+": 337, "HBO Max": 1899, "Amazon": 119, "Crunchyroll": 283}
+            p_s = [p_d[p] for p in p_d if st.checkbox(p)]
+
             min_r = st.slider("Valoración ⭐", 0, 10, 6)
             st.form_submit_button("🔍 APLICAR")
-    else: t_api, min_r, solo_f, m_s, h_s = "movie", 0, False, [], []
+    else: t_api, min_r, solo_f, m_s, h_s, p_s = "movie", 0, False, [], [], []
 
 # --- CARRUSEL ---
 estrenos = requests.get(f"{BASE_URL}/trending/all/day?api_key={API_KEY}&language=es-ES").json().get('results', [])[:5]
@@ -151,7 +158,9 @@ if estrenos:
 busq = st.text_input("", placeholder="Busca aquí...")
 if solo_f: resultados = st.session_state.favoritos
 else:
-    p = {"api_key": API_KEY, "language": "es-ES", "sort_by": "popularity.desc", "vote_average.gte": min_r, "with_genres": ",".join(m_s + h_s)}
+    gen_filt = ",".join(m_s + h_s)
+    p = {"api_key": API_KEY, "language": "es-ES", "sort_by": "popularity.desc", "vote_average.gte": min_r, "with_genres": gen_filt}
+    if p_s: p["with_watch_providers"] = "|".join(map(str, p_s)); p["watch_region"] = "ES"
     resultados = requests.get(f"{BASE_URL}/search/{t_api}" if busq else f"{BASE_URL}/discover/{t_api}", params={**p, "query": busq}).json().get('results', [])
 
 if resultados:
@@ -162,11 +171,10 @@ if resultados:
             tit_i = item.get('title') or item.get('name')
             tra, provs, link_p = obtener_detalles_completos(item['id'], t_api, tit_i)
             
-            # Clic en cartelera lleva a plataforma
             if item.get('poster_path'):
                 st.markdown(f'<a href="{link_p}" target="_blank"><img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;"></a>', unsafe_allow_html=True)
             
-            with st.container(height=360, border=False):
+            with st.container(height=380, border=False):
                 st.markdown(f"**{tit_i}**")
                 if st.session_state.usuario:
                     es_f = any(f['id'] == item['id'] for f in st.session_state.favoritos)
@@ -175,10 +183,9 @@ if resultados:
                         else: st.session_state.favoritos.append(item)
                         st.rerun()
                 
-                # Logos sin repetir
                 if provs:
-                    h_p = '<div style="display: flex; gap: 5px; margin-top: 5px;">'
-                    for p in provs[:4]: h_p += f'<img src="{LOGO_URL}{p["logo_path"]}" width="25" style="border-radius:5px;">'
+                    h_p = '<div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px;">'
+                    for p in provs[:4]: h_p += f'<img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;">'
                     st.markdown(h_p + '</div>', unsafe_allow_html=True)
                 
                 if tra:
