@@ -20,8 +20,7 @@ st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
     
-    html, body, [class*="st-"] { font-family: sans-serif !important; }
-    .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
+        .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
     
     /* Arreglo para el botón de la barra lateral */
     [data-testid="stSidebarCollapsedControl"] {
@@ -214,3 +213,4 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
