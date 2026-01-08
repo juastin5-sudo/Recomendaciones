@@ -23,7 +23,35 @@ st.markdown("""
         [data-testid="sidebar-close"] {
             display: none !important;
         }
+        /* SOLUCIÓN DEFINITIVA PARA EL BOTÓN DEL TRÁILER */
         
+        /* 1. Ocultamos el icono y cualquier texto de error dentro del expander */
+        div[data-testid="stExpander"] details summary svg,
+        div[data-testid="stExpander"] details summary [data-testid="stIconMaterial"] {
+            display: none !important;
+        }
+
+        /* 2. Matamos el texto "keyboard_arrow" que se escapa */
+        div[data-testid="stExpander"] details summary {
+            font-size: 0 !important; /* El error se vuelve invisible */
+            list-style: none !important;
+            color: transparent !important;
+        }
+
+        /* 3. Forzamos que SOLO tu texto "VER TRÁILER" sea visible y limpio */
+        div[data-testid="stExpander"] details summary p {
+            font-size: 14px !important; /* Tu texto recupera su tamaño */
+            color: white !important;
+            visibility: visible !important;
+            display: block !important;
+            margin: 0 !important;
+            padding: 0 !important;
+        }
+
+        /* 4. Bloquear Sidebar (Como pediste, para que no se cierre) */
+        [data-testid="sidebar-close"], [data-testid="stSidebarCollapseButton"] {
+            display: none !important;
+        }
         /* ELIMINAR EL BOTÓN DE ABRIR (POR SI ACASO) */
         [data-testid="stSidebarCollapseButton"] {
             display: none !important;
@@ -264,6 +292,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
