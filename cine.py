@@ -28,6 +28,32 @@ st.markdown("""
         [data-testid="stSidebarCollapseButton"] {
             display: none !important;
         }
+
+        /* SOLUCIÓN RADICAL PARA EL ERROR DE TEXTO */
+        /* 1. Forzamos que cualquier texto suelto en el summary sea invisible */
+        div[data-testid="stExpander"] details summary {
+            font-size: 0 !important;
+            color: transparent !important;
+            list-style: none !important;
+        }
+
+        /* 2. Recuperamos solo tu texto "VER TRÁILER" */
+        div[data-testid="stExpander"] details summary p {
+            font-size: 14px !important;
+            color: white !important; /* Puedes cambiar 'white' por el color que prefieras */
+            visibility: visible !important;
+            display: block !important;
+        }
+
+        /* 3. Eliminamos el icono SVG que causa el desplazamiento */
+        div[data-testid="stExpander"] details summary svg {
+            display: none !important;
+        }
+
+        /* 4. Mantenemos la barra lateral abierta y fija (como pediste) */
+        [data-testid="sidebar-close"], [data-testid="stSidebarCollapseButton"] {
+            display: none !important;
+        }
     /* 1. ELIMINAR EL TEXTO DEL ERROR EN TODA LA APP */
         [data-testid="stIconMaterial"] {
             display: none !important;
@@ -238,6 +264,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
