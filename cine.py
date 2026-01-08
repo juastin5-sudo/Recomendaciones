@@ -4,7 +4,7 @@ import pandas as pd
 import requests
 import streamlit.components.v1 as components
 
-# 1. Configuración de página - Oculta la barra lateral al inicio
+# 1. Configuración de página
 st.set_page_config(
     page_title="Juastin Stream Pro", 
     page_icon="🎬", 
@@ -15,40 +15,17 @@ st.set_page_config(
 # --- CONEXIÓN A BASE DE DATOS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- ESTILOS CSS (LIMPIEZA DE ERRORES Y DISEÑO) ---
+# --- ESTILOS CSS ---
 st.markdown("""
 <style>
     @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-    
-        .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
-    
-    /* Arreglo para el botón de la barra lateral */
-    [data-testid="stSidebarCollapsedControl"] {
-        font-family: 'Material Icons' !important;
-        background-color: #E50914 !important;
-        color: white !important;
-        border-radius: 0 10px 10px 0 !important;
-    }
-
-    /* Ocultar iconos internos que causan errores de texto */
+    .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
+    [data-testid="stSidebarCollapsedControl"] { font-family: 'Material Icons' !important; background-color: #E50914 !important; color: white !important; border-radius: 0 10px 10px 0 !important; }
     [data-testid="stExpanderIcon"], .stExpander svg { display: none !important; }
-
     .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
-    
-    div.stForm submit_button > button { 
-        background-color: #E50914 !important; color: white !important; 
-        font-weight: bold !important; border: none !important; width: 100%; 
-    }
-
-    .valoracion-container { 
-        margin-top: 15px; margin-bottom: 18px; font-weight: bold; 
-        display: flex; align-items: center; gap: 5px; color: #FFD700; 
-    }
-
-    .resumen-inferior { 
-        font-size: 12px; color: #bbbbbb; line-height: 1.4; margin-top: 8px; 
-        height: 85px; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; 
-    }
+    div.stForm submit_button > button { background-color: #E50914 !important; color: white !important; font-weight: bold !important; border: none !important; width: 100%; }
+    .valoracion-container { margin-top: 15px; margin-bottom: 18px; font-weight: bold; display: flex; align-items: center; gap: 5px; color: #FFD700; }
+    .resumen-inferior { font-size: 12px; color: #bbbbbb; line-height: 1.4; margin-top: 8px; height: 85px; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; }
 </style>
 """, unsafe_allow_html=True)
 
@@ -59,8 +36,14 @@ IMAGE_URL = "https://image.tmdb.org/t/p/original"
 POSTER_URL = "https://image.tmdb.org/t/p/w500"
 LOGO_URL = "https://image.tmdb.org/t/p/original"
 
-# Lista de IDs de proveedores considerados "Premium"
-PREMIUM_PROVIDERS = [8, 337, 1899, 119, 283, 350, 15, 2, 384] # Netflix, Disney+, HBO, Amazon, Crunchyroll, Apple TV, Movistar, etc.
+# Mapeo de búsqueda directa para evitar la página intermedia de recomendaciones
+PLATFORM_SEARCH_URLS = {
+    8: "https://www.netflix.com/search?q=",
+    337: "https://www.disneyplus.com/search?q=",
+    119: "https://www.amazon.com/s?k=",
+    1899: "https://www.max.com/search/",
+    283: "https://www.crunchyroll.com/search?q="
+}
 
 def obtener_detalles_completos(item_id, tipo, titulo_item):
     params = {"api_key": API_KEY, "language": "es-ES", "append_to_response": "videos,watch/providers"}
@@ -76,18 +59,18 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
         
-        vistos = set()
+        # Filtrar solo Premium y generar link directo
         providers_premium = []
+        link_final = f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
+        
         for p in providers:
-            # Filtramos para que solo incluya los IDs de la lista Premium
-            if p['provider_id'] in PREMIUM_PROVIDERS and p['provider_name'] not in vistos:
+            p_id = p['provider_id']
+            if p_id in PLATFORM_SEARCH_URLS:
                 providers_premium.append(p)
-                vistos.add(p['provider_name'])
+                # Si encontramos una plataforma premium, construimos el enlace de búsqueda directa
+                link_final = f"{PLATFORM_SEARCH_URLS[p_id]}{titulo_item.replace(' ', '+')}"
         
-        # El link_ver ahora prioriza el enlace directo de la plataforma si existe
-        link_ver = region.get('link') if providers else f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
-        
-        return trailer, providers_premium, link_ver
+        return trailer, providers_premium, link_final
     except:
         return None, [], f"https://www.google.com/search?q={titulo_item}"
 
@@ -198,6 +181,8 @@ if resultados:
         with cols[i % 4]:
             tit_i = item.get('title') or item.get('name')
             tra, provs, link_p = obtener_detalles_completos(item['id'], tipo_api, tit_i)
+            
+            # Imagen clicable que redirige a la plataforma
             if item.get('poster_path'):
                 st.markdown(f'<a href="{link_p}" target="_blank"><img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;"></a>', unsafe_allow_html=True)
             
@@ -213,7 +198,6 @@ if resultados:
                 if provs:
                     h_p = '<div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px;">'
                     for p in provs[:4]: 
-                        # Los logos también llevan al link de la plataforma
                         h_p += f'<a href="{link_p}" target="_blank"><img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;"></a>'
                     st.markdown(h_p + '</div>', unsafe_allow_html=True)
                 
@@ -222,5 +206,5 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
-                st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
