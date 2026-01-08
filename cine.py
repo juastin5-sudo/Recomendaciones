@@ -17,43 +17,47 @@ st.markdown("""
         html, body, [class*="st-"] { font-family: sans-serif !important; }
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
-       /* 1. ELIMINACIÓN TOTAL DE TEXTO DE ICONOS EN TODA LA APP */
-        /* Esto limpia los nombres de iconos que aparecen arriba y en botones */
+       /* ELIMINACIÓN DE ERRORES Y ESTILO AZUL PROFESIONAL */
+        /* 1. Limpieza total de los textos de iconos (keyboard_arrow) */
         span[data-testid="stIconMaterial"], 
-        .st-emotion-cache-ue6h4q, 
-        summary svg {
+        div[data-testid="stExpander"] details summary svg,
+        div[data-testid="stExpander"] details summary::marker {
             display: none !important;
         }
 
-        /* 2. ESTILO TIPO BOTÓN PARA EL EXPANDER (MÁS ESTÉTICO) */
+        /* 2. Estilo del contenedor principal (Quitamos la doble casilla) */
         div[data-testid="stExpander"] {
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 4px !important;
-            background-color: transparent !important;
+            border: 1px solid #00d4ff !important; /* Borde azul claro */
+            background-color: rgba(0, 212, 255, 0.05) !important; /* Fondo sutil azul */
+            border-radius: 10px !important;
+            padding: 0 !important;
         }
 
+        /* 3. Estilo del encabezado del botón */
         div[data-testid="stExpander"] details summary {
             list-style: none !important;
-            padding: 5px !important;
-            /* Forzamos que el texto del icono sea invisible si el display:none falla */
-            font-size: 0 !important; 
-            color: transparent !important;
+            font-size: 0 !important; /* Mata el texto del error */
+            padding: 12px !important;
+            display: flex !important;
+            justify-content: center !important;
+            cursor: pointer !important;
         }
 
-        /* 3. RECUPERAR SOLO EL TEXTO "VER TRÁILER" */
+        /* 4. Texto "VER TRÁILER" en azul claro */
         div[data-testid="stExpander"] details summary p {
-            font-size: 0.8rem !important;
-            color: #E50914 !important; /* Rojo para que combine con tu UI */
+            font-size: 0.9rem !important;
+            color: #00d4ff !important; /* Azul claro Neón */
             font-weight: bold !important;
             text-transform: uppercase !important;
+            letter-spacing: 1.5px !important;
             margin: 0 !important;
-            width: 100%;
-            text-align: center; /* Centrado se ve más premium */
+            text-align: center;
         }
 
-        /* 4. ELIMINAR FLECHAS NATIVAS */
-        div[data-testid="stExpander"] details summary::-webkit-details-marker {
-            display: none !important;
+        /* Hover: efecto al pasar el mouse */
+        div[data-testid="stExpander"]:hover {
+            border-color: #ffffff !important;
+            background-color: rgba(0, 212, 255, 0.15) !important;
         }
         /* Ajuste de Botones y Cartelera */
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
@@ -225,6 +229,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
