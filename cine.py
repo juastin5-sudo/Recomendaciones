@@ -216,7 +216,7 @@ if resultados:
                 ''', unsafe_allow_html=True)
             
             # 2. CONTENEDOR DE INFO (Subimos la altura a 450 para que quepa el resumen)
-            with st.container(height=450, border=False):
+            with st.container(height=200, border=False):
                 st.markdown(f"**{tit_i}**")
                 
                 if st.session_state.usuario:
@@ -248,6 +248,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
