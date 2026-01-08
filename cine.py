@@ -104,29 +104,33 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
         premium_names = ["Netflix", "Disney Plus", "HBO Max", "Max", "Amazon Prime Video", "Apple TV Plus", "Crunchyroll"]
         providers_premium = [p for p in providers if p['provider_name'] in premium_names]
         
-        # 3. ENLACES SEGUROS (Sin errores de "Página no encontrada")
-        titulo_query = titulo_item.replace(' ', '+')
+        # 3. ENLACES DE BÚSQUEDA INTERNA (Directo a la App)
+        query = titulo_item.replace(' ', '%20') # Formato para URL
         if providers_premium:
             p_name = providers_premium[0]['provider_name'].lower()
             
-            # Si es Netflix, su buscador interno suele funcionar bien:
             if "netflix" in p_name:
-                link_ver = f"https://www.netflix.com/search?q={titulo_query}"
+                link_ver = f"https://www.netflix.com/search?q={query}"
             
-            # Para Disney, Max, Crunchy y Prime, usamos el comando 'site:' de Google 
-            # que te lleva directo al contenido oficial sin errores de link roto.
             elif "disney" in p_name:
-                link_ver = f"https://www.google.com/search?q=site:disneyplus.com+{titulo_query}"
+                # Disney no permite búsqueda por URL directa, pero este link abre su buscador
+                link_ver = "https://www.disneyplus.com/search"
+            
             elif "crunchyroll" in p_name:
-                link_ver = f"https://www.google.com/search?q=site:crunchyroll.com+{titulo_query}"
+                # Crunchyroll usa este formato para búsquedas
+                link_ver = f"https://www.crunchyroll.com/es/search?q={query}"
+            
             elif "max" in p_name or "hbo" in p_name:
-                link_ver = f"https://www.google.com/search?q=site:max.com+{titulo_query}"
+                # El nuevo enlace de búsqueda para MAX
+                link_ver = f"https://www.max.com/search/{titulo_item.replace(' ', '-')}/"
+            
             elif "amazon" in p_name or "prime" in p_name:
-                link_ver = f"https://www.amazon.es/s?k={titulo_query}&i=instant-video"
+                link_ver = f"https://www.primevideo.com/search/ref=atv_nb_sr?phrase={query}"
+            
             else:
-                link_ver = region.get('link') # Fallback oficial
+                link_ver = region.get('link') # Link oficial de TMDB (el que te enviaba a recomendaciones)
         else:
-            link_ver = f"https://www.google.com/search?q=donde+ver+{titulo_query}+online+españa"
+            link_ver = f"https://www.google.com/search?q=ver+{query}+online"
             
         return trailer, providers_premium, link_ver
     except: 
@@ -267,6 +271,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
