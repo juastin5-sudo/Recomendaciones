@@ -5,7 +5,7 @@ import requests
 import streamlit.components.v1 as components
 
 # 1. Configuración de la página
-st.set_page_config(page_title="Juastin Stream Pro", page_icon="🎬", layout="wide", initial_sidebar_state="expanded")
+st.set_page_config(page_title="Merida Stream Pro", page_icon="🎬", layout="wide", initial_sidebar_state="expanded")
 # --- CONEXIÓN A BASE DE DATOS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
@@ -271,6 +271,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
