@@ -4,8 +4,7 @@ import pandas as pd
 import requests
 import streamlit.components.v1 as components
 
-# 1. Configuración de la página
-# 1. Cambia tu primera línea por esta (esto la oculta al cargar la página)
+# 1. Configuración de la página: Oculta la barra lateral al inicio
 st.set_page_config(
     page_title="Juastin Stream Pro", 
     page_icon="🎬", 
@@ -13,18 +12,37 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. Agrega este bloque de CSS dentro de tu sección de estilos (st.markdown) 
-# Esto hace que el botón para abrirla sea más visible y elegante
+# 2. Bloque de CSS para arreglar la letra, ocultar errores y estilizar el botón lateral
 st.markdown("""
-    <style>
-        /* Estilo para el botón de la barra lateral cuando está oculta */
-        [data-testid="stSidebarCollapsedControl"] {
-            background-color: rgba(229, 9, 20, 0.8); /* Rojo Netflix */
-            border-radius: 0 10px 10px 0;
-            color: white;
-            padding: 5px;
-        }
-    </style>
+<style>
+    /* Tipografía Sans Serif limpia para toda la app */
+    html, body, [class*="st-"], .stMarkdown {
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    }
+
+    /* ELIMINAR EL ERROR 'keyboard_arrow' DEFINITIVAMENTE */
+    summary svg, 
+    span[data-testid="stExpanderIcon"], 
+    .stExpander svg {
+        display: none !important;
+    }
+    
+    /* Estilo para el botón de la barra lateral cuando está oculta */
+    [data-testid="stSidebarCollapsedControl"] {
+        background-color: rgba(229, 9, 20, 0.9); /* Rojo Netflix */
+        border-radius: 0 10px 10px 0;
+        color: white;
+        padding: 5px;
+        top: 10px;
+    }
+
+    /* Ajuste para que los botones de trailer no se vean amontonados */
+    .stExpander {
+        border: 1px solid rgba(255,255,255,0.1) !important;
+        border-radius: 10px !important;
+        background-color: rgba(255,255,255,0.05) !important;
+    }
+</style>
 """, unsafe_allow_html=True)
                /* 3. Forzamos que SOLO tu texto "VER TRÁILER" sea visible y limpio */
         div[data-testid="stExpander"] details summary p {
@@ -277,6 +295,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
