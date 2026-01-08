@@ -1,6 +1,7 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
+import requests
 
 # Conectamos con tu Google Sheet
 conn = st.connection("gsheets", type=GSheetsConnection)
@@ -57,3 +58,4 @@ with st.sidebar:
         if st.button("Cerrar Sesión"):
             st.session_state.usuario = None
             st.rerun()
+
