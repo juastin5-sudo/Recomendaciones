@@ -98,21 +98,30 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
                 trailer = f"https://www.youtube.com/watch?v={v['key']}"
                 break
         
-        # 2. Filtrar proveedores Premium
+        # 2. Proveedores Premium
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
         
-        # Lista de apps Premium que quieres mostrar
-        premium_names = ["Netflix", "Disney Plus", "HBO Max", "Max", "Amazon Prime Video", "Apple TV Plus", "Crunchyroll", "SkyShowtime"]
+        premium_names = ["Netflix", "Disney Plus", "HBO Max", "Max", "Amazon Prime Video", "Apple TV Plus", "Crunchyroll"]
         providers_premium = [p for p in providers if p['provider_name'] in premium_names]
         
-        # 3. ENLACE DIRECTO (El que tenías antes que funcionaba)
-        # Priorizamos el link de la región que redirige a la plataforma
-        link_ver = region.get('link') 
-        
-        # Si por alguna razón no hay link, usamos Google como respaldo
-        if not link_ver:
-            link_ver = f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
+        # 3. CONSTRUCCIÓN DEL LINK DINÁMICO
+        # Si detectamos una plataforma Premium, creamos un link de búsqueda directa en esa plataforma
+        if providers_premium:
+            p_name = providers_premium[0]['provider_name'].lower()
+            if "netflix" in p_name:
+                link_ver = f"https://www.netflix.com/search?q={titulo_item.replace(' ', '%20')}"
+            elif "disney" in p_name:
+                link_ver = f"https://www.disneyplus.com/search"
+            elif "amazon" in p_name or "prime" in p_name:
+                link_ver = f"https://www.primevideo.com/search/ref=atv_nb_sr?phrase={titulo_item.replace(' ', '%20')}"
+            elif "hbo" in p_name or "max" in p_name:
+                link_ver = f"https://www.max.com/search/{titulo_item.replace(' ', '-')}/"
+            else:
+                link_ver = region.get('link') # Fallback al link de TMDB si no es de las grandes
+        else:
+            # Si no hay plataforma, buscamos en Google directamente donde verla
+            link_ver = f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online+españa"
             
         return trailer, providers_premium, link_ver
     except: 
@@ -253,6 +262,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
