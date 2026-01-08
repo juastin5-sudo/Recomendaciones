@@ -183,7 +183,7 @@ if estrenos:
                     <div>
                         <span style="background: #E50914; padding: 5px 12px; border-radius: 4px; font-weight: bold;">TOP #{i+1}</span>
                         <h1 style="font-size: 45px; margin: 10px 0; font-family: 'Georgia', serif !important; font-weight: bold; letter-spacing: 2px;">{tit}</h1>
-                        <p style="max-width: 600px; font-size: 16px;">{res}</p>
+                       <p style="max-width: 600px; font-size: 16px; font-family: 'Verdana', sans-serif !important; line-height: 1.6; color: #dddddd;">{res}</p>
                     </div>
                 </div>
             </a>
@@ -229,6 +229,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
