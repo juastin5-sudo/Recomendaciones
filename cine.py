@@ -23,22 +23,7 @@ st.markdown("""
         [data-testid="sidebar-close"] {
             display: none !important;
         }
-        /* SOLUCIÓN DEFINITIVA PARA EL BOTÓN DEL TRÁILER */
-        
-        /* 1. Ocultamos el icono y cualquier texto de error dentro del expander */
-        div[data-testid="stExpander"] details summary svg,
-        div[data-testid="stExpander"] details summary [data-testid="stIconMaterial"] {
-            display: none !important;
-        }
-
-        /* 2. Matamos el texto "keyboard_arrow" que se escapa */
-        div[data-testid="stExpander"] details summary {
-            font-size: 0 !important; /* El error se vuelve invisible */
-            list-style: none !important;
-            color: transparent !important;
-        }
-
-        /* 3. Forzamos que SOLO tu texto "VER TRÁILER" sea visible y limpio */
+               /* 3. Forzamos que SOLO tu texto "VER TRÁILER" sea visible y limpio */
         div[data-testid="stExpander"] details summary p {
             font-size: 14px !important; /* Tu texto recupera su tamaño */
             color: white !important;
@@ -57,13 +42,6 @@ st.markdown("""
             display: none !important;
         }
 
-        /* SOLUCIÓN RADICAL PARA EL ERROR DE TEXTO */
-        /* 1. Forzamos que cualquier texto suelto en el summary sea invisible */
-        div[data-testid="stExpander"] details summary {
-            font-size: 0 !important;
-            color: transparent !important;
-            list-style: none !important;
-        }
 
         /* 2. Recuperamos solo tu texto "VER TRÁILER" */
         div[data-testid="stExpander"] details summary p {
@@ -82,45 +60,7 @@ st.markdown("""
         [data-testid="sidebar-close"], [data-testid="stSidebarCollapseButton"] {
             display: none !important;
         }
-    /* 1. ELIMINAR EL TEXTO DEL ERROR EN TODA LA APP */
-        [data-testid="stIconMaterial"] {
-            display: none !important;
-        }
-
-        /* 2. LIMPIAR EL EXPANDER (Sin cajas dobles ni colores neón) */
-        div[data-testid="stExpander"] {
-            border: none !important;
-            background: transparent !important;
-            box-shadow: none !important;
-        }
-
-        div[data-testid="stExpander"] details summary {
-            display: flex !important;
-            align-items: center;
-            list-style: none !important;
-            font-size: 0 !important; /* Mata el texto "keyboard_arrow" */
-        }
-
-        /* 3. PONER UNA FLECHA SIMPLE (Como pediste) */
-        div[data-testid="stExpander"] details summary::after {
-            content: " ▼"; /* Una flecha de texto estándar */
-            font-size: 12px !important;
-            color: #bbbbbb;
-            margin-left: auto;
-        }
-
-        /* 4. TEXTO DEL BOTÓN */
-        div[data-testid="stExpander"] details summary p {
-            font-size: 14px !important;
-            color: white !important;
-            margin: 0 !important;
-        }
-
-        /* 5. RESTAURAR BOTONES DE LOGIN (Sidebar) */
-        .stSidebar [data-testid="stBaseButton-secondary"] {
-            display: inline-flex !important;
-            background-color: #E50914 !important;
-        }
+    
         
         /* Ajuste de Botones y Cartelera */
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
