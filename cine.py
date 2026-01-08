@@ -10,29 +10,42 @@ st.set_page_config(page_title="Juastin Stream Pro", page_icon="🎬", layout="wi
 # --- CONEXIÓN A BASE DE DATOS ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- ESTILOS CSS (Diseño original restaurado) ---
+# --- ESTILOS CSS (DISEÑO ORIGINAL Y TIPOGRAFÍA SANS-SERIF) ---
 st.markdown("""
     <style>
-        html, body, [class*="st-"] { font-family: sans-serif !important; }
+        /* Tipografía Global Sans Serif */
+        html, body, [class*="st-"] { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; }
+
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
+        
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
+        
+        /* Estilo para el Carrusel */
+        .hero-container { border-radius: 20px; overflow: hidden; }
+        
+        /* Corregir errores de texto en botones de expander */
+        .stExpander label { color: white !important; font-weight: bold; }
+
         div.stForm submit_button > button { 
             margin-top: 20px !important; 
             background-color: #E50914 !important; color: white !important; 
             font-weight: bold !important; border: none !important; width: 100%;
         }
+
+        /* Espaciado Valoración vs Raya */
         .valoracion-container { 
-            margin-top: 15px; margin-bottom: 15px; font-weight: bold; 
+            margin-top: 15px; margin-bottom: 18px; font-weight: bold; 
             display: flex; align-items: center; gap: 5px; color: #FFD700; 
         }
+
         .resumen-inferior { 
-            font-size: 12px; color: #bbbbbb; line-height: 1.3; margin-top: 8px; 
-            height: 85px; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 5px; 
+            font-size: 12px; color: #bbbbbb; line-height: 1.4; margin-top: 8px; 
+            height: 85px; overflow: hidden; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 8px; 
         }
     </style>
 """, unsafe_allow_html=True)
 
-# --- CONFIGURACIÓN DE API TMDB ---
+# --- FUNCIONES API ---
 API_KEY = "d47891b58f979b4677c9697556247e06" 
 BASE_URL = "https://api.themoviedb.org/3"
 IMAGE_URL = "https://image.tmdb.org/t/p/original"
@@ -70,11 +83,11 @@ def obtener_detalles_extras(item_id, tipo, titulo_item):
         return trailer, providers_unicos, url_final
     except: return None, [], None
 
-# --- INICIALIZACIÓN DE ESTADOS ---
+# --- ESTADOS DE SESIÓN ---
 if 'usuario' not in st.session_state: st.session_state.usuario = None
 if 'favoritos' not in st.session_state: st.session_state.favoritos = []
 
-# --- BARRA LATERAL (ACCESO + FILTROS BLOQUEADOS) ---
+# --- SIDEBAR (LOGIN + FILTROS) ---
 with st.sidebar:
     st.title("👤 Mi Cuenta")
     try:
@@ -103,7 +116,7 @@ with st.sidebar:
                     df_f = pd.concat([df_usuarios, nuevo_u], ignore_index=True)
                     conn.update(worksheet="Usuarios", data=df_f)
                     st.session_state.usuario = n_reg
-                    st.success("¡Bienvenido!")
+                    st.success("¡Registrado!")
                     st.rerun()
     else:
         st.success(f"Hola, {st.session_state.usuario.capitalize()}!")
@@ -121,35 +134,35 @@ with st.sidebar:
             min_rating = st.slider("Valoración ⭐", 0, 10, 6)
             aplicar = st.form_submit_button("🔍 APLICAR")
     else:
-        st.warning("🔒 Inicia sesión para usar filtros y guardar favoritos.")
+        st.info("🔓 Inicia sesión para desbloquear filtros y guardar tus favoritos.")
         tipo_api = "movie"
         min_rating = 0
         solo_favs = False
 
-# --- CONTENIDO PRINCIPAL ---
-# 1. Carrusel de Estrenos (Siempre visible)
+# --- CARTELLERA Y BUSQUEDA (PÚBLICO) ---
 estrenos = obtener_datos("trending/all/day")[:5]
 if estrenos:
     slides_html = ""
     for i, item in enumerate(estrenos):
         tit = (item.get('title') or item.get('name')).replace("'", "")
+        resumen_banner = item.get('overview', 'Sin descripción.')[:220] + "..."
         _, _, url_e = obtener_detalles_extras(item['id'], item.get('media_type', 'movie'), tit)
         slides_html += f"""
         <div class="mySlides fade">
             <a href="{url_e}" target="_blank" style="text-decoration: none;">
-                <div class="hero-container" style="background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.3)), url('{IMAGE_URL}{item.get('backdrop_path')}'); height: 380px; background-size: cover; background-position: center; border-radius: 20px; display: flex; align-items: center; padding: 40px; color: white;">
+                <div class="hero-container" style="background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.3)), url('{IMAGE_URL}{item.get('backdrop_path')}'); height: 420px; background-size: cover; background-position: center; border-radius: 20px; display: flex; align-items: center; padding: 40px; color: white;">
                     <div>
-                        <span style="background: #E50914; padding: 5px 10px; border-radius: 4px; font-weight: bold;">ESTRENO</span>
-                        <h1 style="font-size: 40px; margin: 10px 0;">{tit}</h1>
+                        <span style="background: #E50914; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 14px;">TOP #{i+1}</span>
+                        <h1 style="font-size: 45px; margin: 15px 0; font-weight: 800;">{tit}</h1>
+                        <p style="max-width: 650px; font-size: 18px; line-height: 1.5; opacity: 0.9;">{resumen_banner}</p>
                     </div>
                 </div>
             </a>
         </div>"""
-    carousel_js = f"""<div class="slideshow-container">{slides_html}</div><script>var slideIndex = 0; function showSlides() {{ var slides = document.getElementsByClassName("mySlides"); for (var i = 0; i < slides.length; i++) {{ slides[i].style.display = "none"; }} slideIndex++; if (slideIndex > slides.length) {{slideIndex = 1}} slides[slideIndex-1].style.display = "block"; setTimeout(showSlides, 4000); }} showSlides();</script>"""
-    components.html(carousel_js, height=400)
+    carousel_js = f"""<div class="slideshow-container">{slides_html}</div><script>var slideIndex = 0; function showSlides() {{ var slides = document.getElementsByClassName("mySlides"); for (var i = 0; i < slides.length; i++) {{ slides[i].style.display = "none"; }} slideIndex++; if (slideIndex > slides.length) {{slideIndex = 1}} slides[slideIndex-1].style.display = "block"; setTimeout(showSlides, 5000); }} showSlides();</script>"""
+    components.html(carousel_js, height=430)
 
-# 2. Buscador y Resultados
-busqueda = st.text_input("", placeholder="Busca tu película favorita...")
+busqueda = st.text_input("", placeholder="Busca tu película favorita aquí...")
 
 if solo_favs and st.session_state.usuario:
     res = st.session_state.favoritos
@@ -167,10 +180,9 @@ if res:
             if item.get('poster_path'):
                 st.markdown(f'<a href="{url_f}" target="_blank"><img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;"></a>', unsafe_allow_html=True)
             
-            with st.container(height=320, border=False):
+            with st.container(height=340, border=False):
                 st.markdown(f"**{t_item}**")
                 
-                # Botón Favoritos (Solo si está logueado)
                 if st.session_state.usuario:
                     es_fav = any(f['id'] == item['id'] for f in st.session_state.favoritos)
                     btn_txt = "❤️ Quitar" if es_fav else "🤍 Guardar"
@@ -180,7 +192,7 @@ if res:
                         st.rerun()
                 
                 if tra:
-                    with st.expander("🎬 VER TRAILER"): st.video(tra)
+                    with st.expander("🎬 VER TRÁILER"): st.video(tra)
+                
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "Sin descripción.")}</div>', unsafe_allow_html=True)
-
