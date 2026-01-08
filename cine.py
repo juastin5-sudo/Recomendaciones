@@ -1,5 +1,38 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
+
+# Función optimizada para leer los datos sin mostrar código técnico
+def cargar_datos_seguros():
+    try:
+        # El spinner oculta el mensaje de "Running GSheets..."
+        with st.spinner("Verificando credenciales..."):
+            conn = st.connection("gsheets", type=GSheetsConnection)
+            df = conn.read(ttl=0) # ttl=0 para que siempre lea lo más nuevo
+            return df
+    except Exception as e:
+        st.error("Error de conexión con la base de datos.")
+        return None
+
+# --- Bloque de Inicio de Sesión ---
+if "password_correct" not in st.session_state:
+    st.subheader("🔐 Acceso Clientes")
+    usuario = st.text_input("Correo electrónico")
+    clave = st.text_input("Contraseña", type="password")
+    
+    if st.button("Iniciar Sesión"):
+        datos = cargar_datos_seguros()
+        
+        if datos is not None:
+            # Aquí verificas si el usuario existe en tu Excel
+            # (Suponiendo que tienes columnas 'usuario' y 'password')
+            usuario_valido = datos[(datos['usuario'] == usuario) & (datos['password'] == clave)]
+            
+            if not usuario_valido.empty:
+                st.session_state.password_correct = True
+                st.session_state.usuario_actual = usuario
+                st.rerun()
+            else:
+                st.error("Usuario o contraseña incorrectos")
 import pandas as pd
 import requests
 import streamlit.components.v1 as components
@@ -271,6 +304,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
