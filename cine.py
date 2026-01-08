@@ -205,22 +205,21 @@ if resultados:
     for i, item in enumerate(resultados[:12]):
         with cols[i % 4]:
             tit_i = item.get('title') or item.get('name')
-            # Obtenemos los datos, incluyendo el link_p (enlace directo o búsqueda)
+            # Recuperamos trailer, proveedores únicos y el link directo
             tra, provs, link_p = obtener_detalles_completos(item['id'], t_api, tit_i)
             
-            # --- IMAGEN CLICABLE ---
+            # --- IMAGEN CLICABLE (Póster) ---
             if item.get('poster_path'):
                 st.markdown(f'''
                     <a href="{link_p}" target="_blank">
-                        <img src="{POSTER_URL}{item["poster_path"]}" 
-                             class="img-clicable" 
-                             style="width:100%; border-radius:10px; margin-bottom:10px;">
+                        <img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;">
                     </a>
                 ''', unsafe_allow_html=True)
             
             with st.container(height=380, border=False):
                 st.markdown(f"**{tit_i}**")
                 
+                # Botón de favoritos (se mantiene igual)
                 if st.session_state.usuario:
                     es_f = any(f['id'] == item['id'] for f in st.session_state.favoritos)
                     if st.button("❤️" if es_f else "🤍", key=f"f_{item['id']}"):
@@ -228,26 +227,28 @@ if resultados:
                         else: st.session_state.favoritos.append(item)
                         st.rerun()
                 
-                # --- ICONOS DE PLATAFORMAS (Sin repetir y con link) ---
+                # --- ICONOS DE PLATAFORMAS (Clicables y sin repetir) ---
                 if provs:
-                    h_p = '<div style="display: flex; gap: 8px; margin-top: 5px; margin-bottom: 10px;">'
-                    for p in provs[:4]: # Mostramos los primeros 4 proveedores únicos
+                    h_p = '<div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px;">'
+                    for p in provs[:4]:
                         h_p += f'''
                             <a href="{link_p}" target="_blank">
-                                <img src="{LOGO_URL}{p["logo_path"]}" 
-                                     width="30" 
-                                     style="border-radius:5px; transition: 0.3s;" 
-                                     title="{p["provider_name"]}">
+                                <img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;" title="{p["provider_name"]}">
                             </a>'''
                     h_p += '</div>'
                     st.markdown(h_p, unsafe_allow_html=True)
                 
+                # --- TU RESUMEN RECUPERADO ---
+                resumen = item.get('overview', 'Sin descripción disponible.')
+                st.markdown(f'<div class="resumen-inferior">{resumen}</div>', unsafe_allow_html=True)
+
+                # --- TRÁILER ---
                 if tra:
                     with st.expander("VER TRÁILER"):
                         st.video(tra)
                 
+                # --- VALORACIÓN ---
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
-
 
 
 
