@@ -101,27 +101,32 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
         # 2. Proveedores Premium
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
-        
         premium_names = ["Netflix", "Disney Plus", "HBO Max", "Max", "Amazon Prime Video", "Apple TV Plus", "Crunchyroll"]
         providers_premium = [p for p in providers if p['provider_name'] in premium_names]
         
-        # 3. CONSTRUCCIÓN DEL LINK DINÁMICO
-        # Si detectamos una plataforma Premium, creamos un link de búsqueda directa en esa plataforma
+        # 3. ENLACES SEGUROS (Sin errores de "Página no encontrada")
+        titulo_query = titulo_item.replace(' ', '+')
         if providers_premium:
             p_name = providers_premium[0]['provider_name'].lower()
+            
+            # Si es Netflix, su buscador interno suele funcionar bien:
             if "netflix" in p_name:
-                link_ver = f"https://www.netflix.com/search?q={titulo_item.replace(' ', '%20')}"
+                link_ver = f"https://www.netflix.com/search?q={titulo_query}"
+            
+            # Para Disney, Max, Crunchy y Prime, usamos el comando 'site:' de Google 
+            # que te lleva directo al contenido oficial sin errores de link roto.
             elif "disney" in p_name:
-                link_ver = f"https://www.disneyplus.com/search"
+                link_ver = f"https://www.google.com/search?q=site:disneyplus.com+{titulo_query}"
+            elif "crunchyroll" in p_name:
+                link_ver = f"https://www.google.com/search?q=site:crunchyroll.com+{titulo_query}"
+            elif "max" in p_name or "hbo" in p_name:
+                link_ver = f"https://www.google.com/search?q=site:max.com+{titulo_query}"
             elif "amazon" in p_name or "prime" in p_name:
-                link_ver = f"https://www.primevideo.com/search/ref=atv_nb_sr?phrase={titulo_item.replace(' ', '%20')}"
-            elif "hbo" in p_name or "max" in p_name:
-                link_ver = f"https://www.max.com/search/{titulo_item.replace(' ', '-')}/"
+                link_ver = f"https://www.amazon.es/s?k={titulo_query}&i=instant-video"
             else:
-                link_ver = region.get('link') # Fallback al link de TMDB si no es de las grandes
+                link_ver = region.get('link') # Fallback oficial
         else:
-            # Si no hay plataforma, buscamos en Google directamente donde verla
-            link_ver = f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online+españa"
+            link_ver = f"https://www.google.com/search?q=donde+ver+{titulo_query}+online+españa"
             
         return trailer, providers_premium, link_ver
     except: 
@@ -262,6 +267,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
