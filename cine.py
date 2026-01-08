@@ -17,48 +17,51 @@ st.markdown("""
         html, body, [class*="st-"] { font-family: sans-serif !important; }
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
-       /* ELIMINACIÓN DE ERRORES Y ESTILO AZUL PROFESIONAL */
-        /* 1. Limpieza total de los textos de iconos (keyboard_arrow) */
-        span[data-testid="stIconMaterial"], 
-        div[data-testid="stExpander"] details summary svg,
-        div[data-testid="stExpander"] details summary::marker {
+       /* 1. LIMPIEZA DE ICONOS (Sin romper botones de login) */
+        /* Solo ocultamos el texto del error, no el botón completo */
+        .st-emotion-cache-ue6h4q, span[data-testid="stIconMaterial"] {
+            font-size: 0 !important;
+            line-height: 0 !important;
+            color: transparent !important;
             display: none !important;
         }
 
-        /* 2. Estilo del contenedor principal (Quitamos la doble casilla) */
+        /* 2. ESTILO EXCLUSIVO PARA EL EXPANDER DE TRÁILER (Azul Claro) */
         div[data-testid="stExpander"] {
-            border: 1px solid #00d4ff !important; /* Borde azul claro */
-            background-color: rgba(0, 212, 255, 0.05) !important; /* Fondo sutil azul */
-            border-radius: 10px !important;
-            padding: 0 !important;
+            border: 1px solid #00fbff !important; /* Azul claro */
+            background-color: rgba(0, 251, 255, 0.03) !important;
+            border-radius: 8px !important;
         }
 
-        /* 3. Estilo del encabezado del botón */
         div[data-testid="stExpander"] details summary {
             list-style: none !important;
-            font-size: 0 !important; /* Mata el texto del error */
-            padding: 12px !important;
+            padding: 8px !important;
             display: flex !important;
             justify-content: center !important;
-            cursor: pointer !important;
         }
 
-        /* 4. Texto "VER TRÁILER" en azul claro */
         div[data-testid="stExpander"] details summary p {
-            font-size: 0.9rem !important;
-            color: #00d4ff !important; /* Azul claro Neón */
+            font-size: 0.85rem !important;
+            color: #00fbff !important; /* Texto Azul */
             font-weight: bold !important;
             text-transform: uppercase !important;
-            letter-spacing: 1.5px !important;
             margin: 0 !important;
-            text-align: center;
         }
 
-        /* Hover: efecto al pasar el mouse */
-        div[data-testid="stExpander"]:hover {
-            border-color: #ffffff !important;
-            background-color: rgba(0, 212, 255, 0.15) !important;
+        /* 3. RESTAURAR BOTONES DE LA SIDEBAR (Login/Filtros) */
+        /* Esto asegura que los botones del formulario sean visibles y rojos como los tenías */
+        section[data-testid="stSidebar"] button {
+            background-color: #E50914 !important;
+            color: white !important;
+            display: inline-flex !important; /* Asegura que no sea invisible */
+            opacity: 1 !important;
+            visibility: visible !important;
+            width: 100% !important;
         }
+
+        /* Quitar flechas molestas solo en el expander */
+        div[data-testid="stExpander"] svg { display: none !important; }
+        
         /* Ajuste de Botones y Cartelera */
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
         div.stForm submit_button > button { 
@@ -229,6 +232,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
