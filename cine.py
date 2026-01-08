@@ -7,25 +7,20 @@ import streamlit.components.v1 as components
 # 1. Configuración de la página
 st.set_page_config(page_title="Juastin Stream Pro", page_icon="🎬", layout="wide")
 
-# --- CONEXIÓN A BASE DE DATOS ---
+# --- CONEXIÓN A BASE DE DATOS (GOOGLE SHEETS) ---
 conn = st.connection("gsheets", type=GSheetsConnection)
 
-# --- ESTILOS CSS (DISEÑO ORIGINAL Y TIPOGRAFÍA SANS-SERIF) ---
+# --- ESTILOS CSS (DISEÑO ORIGINAL SIN ERRORES) ---
 st.markdown("""
     <style>
-        /* Tipografía Global Sans Serif */
         html, body, [class*="st-"] { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important; }
-
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
-        
+        .block-container {padding-top: 1rem;}
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
         
-        /* Estilo para el Carrusel */
-        .hero-container { border-radius: 20px; overflow: hidden; }
+        /* Limpiar botones de trailer */
+        .stExpander { border: none !important; background: transparent !important; }
         
-        /* Corregir errores de texto en botones de expander */
-        .stExpander label { color: white !important; font-weight: bold; }
-
         div.stForm submit_button > button { 
             margin-top: 20px !important; 
             background-color: #E50914 !important; color: white !important; 
@@ -45,7 +40,7 @@ st.markdown("""
     </style>
 """, unsafe_allow_html=True)
 
-# --- FUNCIONES API ---
+# --- CONFIGURACIÓN API ---
 API_KEY = "d47891b58f979b4677c9697556247e06" 
 BASE_URL = "https://api.themoviedb.org/3"
 IMAGE_URL = "https://image.tmdb.org/t/p/original"
@@ -83,11 +78,11 @@ def obtener_detalles_extras(item_id, tipo, titulo_item):
         return trailer, providers_unicos, url_final
     except: return None, [], None
 
-# --- ESTADOS DE SESIÓN ---
+# --- USUARIOS Y FAVORITOS ---
 if 'usuario' not in st.session_state: st.session_state.usuario = None
 if 'favoritos' not in st.session_state: st.session_state.favoritos = []
 
-# --- SIDEBAR (LOGIN + FILTROS) ---
+# --- SIDEBAR (LOGIN + FILTROS COMPLETOS) ---
 with st.sidebar:
     st.title("👤 Mi Cuenta")
     try:
@@ -105,94 +100,113 @@ with st.sidebar:
                 if n_login in lista_nombres:
                     st.session_state.usuario = n_login
                     st.rerun()
-                else: st.error("Usuario no encontrado.")
+                else: st.error("No registrado.")
         with t2:
             n_reg = st.text_input("Nombre único", key="r").lower().strip()
             if st.button("Validar y Crear"):
-                if n_reg in lista_nombres: st.error("❌ Nombre en uso.")
+                if n_reg in lista_nombres: st.error("❌ En uso.")
                 elif n_reg == "": st.warning("Escribe un nombre.")
                 else:
-                    nuevo_u = pd.DataFrame([{"usuario": n_reg}])
-                    df_f = pd.concat([df_usuarios, nuevo_u], ignore_index=True)
+                    df_f = pd.concat([df_usuarios, pd.DataFrame([{"usuario": n_reg}])], ignore_index=True)
                     conn.update(worksheet="Usuarios", data=df_f)
                     st.session_state.usuario = n_reg
-                    st.success("¡Registrado!")
                     st.rerun()
     else:
-        st.success(f"Hola, {st.session_state.usuario.capitalize()}!")
+        st.success(f"Hola, {st.session_state.usuario.capitalize()}")
         if st.button("Cerrar Sesión"):
             st.session_state.usuario = None
             st.rerun()
 
     st.markdown("---")
+    # Filtros avanzados bloqueados hasta login
     if st.session_state.usuario:
-        with st.form("filtros"):
-            st.write("### ⚙️ Filtros Avanzados")
+        with st.form("filtros_completos"):
+            st.write("### ⚙️ Filtros")
             solo_favs = st.checkbox("❤️ Ver mis Favoritos")
-            tipo_sel = st.radio("Contenido:", ["Películas", "Series"])
+            tipo_sel = st.radio("Ver:", ["Películas", "Series"])
             tipo_api = "movie" if tipo_sel == "Películas" else "tv"
-            min_rating = st.slider("Valoración ⭐", 0, 10, 6)
-            aplicar = st.form_submit_button("🔍 APLICAR")
-    else:
-        st.info("🔓 Inicia sesión para desbloquear filtros y guardar tus favoritos.")
-        tipo_api = "movie"
-        min_rating = 0
-        solo_favs = False
+            
+            st.write("#### 🍳 Menú")
+            dict_menu = {"☕ Desayuno": "28,12", "🍲 Almuerzo": "99,18", "🍰 Merienda": "35,10751", "🌙 Cena": "53,80"}
+            menu_sel = [dict_menu[m] for m in dict_menu if st.checkbox(m)]
+            
+            st.write("#### 🎭 Humor")
+            dict_humor = {"😂 Reír": "35", "😱 Tensión": "53,27", "🎭 Drama": "18", "🚀 Futuro": "878"}
+            humor_sel = [dict_humor[h] for h in dict_humor if st.checkbox(h)]
 
-# --- CARTELLERA Y BUSQUEDA (PÚBLICO) ---
+            st.write("#### 📺 Plataformas")
+            dict_p = {"Netflix": 8, "Disney+": 337, "HBO Max": 1899, "Amazon": 119, "Crunchyroll": 283}
+            p_sel = [dict_p[p] for p in dict_p if st.checkbox(p)]
+
+            min_rating = st.slider("Valoración ⭐", 0, 10, 6)
+            st.form_submit_button("🔍 APLICAR")
+    else:
+        st.info("🔓 Inicia sesión para usar filtros y guardar favoritos.")
+        tipo_api, min_rating, solo_favs, menu_sel, humor_sel, p_sel = "movie", 0, False, [], [], []
+
+# --- CONTENIDO PRINCIPAL ---
+# Carrusel
 estrenos = obtener_datos("trending/all/day")[:5]
 if estrenos:
-    slides_html = ""
+    slides = ""
     for i, item in enumerate(estrenos):
         tit = (item.get('title') or item.get('name')).replace("'", "")
-        resumen_banner = item.get('overview', 'Sin descripción.')[:220] + "..."
+        res = item.get('overview', '')[:220] + "..."
         _, _, url_e = obtener_detalles_extras(item['id'], item.get('media_type', 'movie'), tit)
-        slides_html += f"""
+        slides += f"""
         <div class="mySlides fade">
             <a href="{url_e}" target="_blank" style="text-decoration: none;">
-                <div class="hero-container" style="background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.3)), url('{IMAGE_URL}{item.get('backdrop_path')}'); height: 420px; background-size: cover; background-position: center; border-radius: 20px; display: flex; align-items: center; padding: 40px; color: white;">
+                <div style="background-image: linear-gradient(to right, rgba(0,0,0,0.9), rgba(0,0,0,0.3)), url('{IMAGE_URL}{item.get('backdrop_path')}'); height: 420px; background-size: cover; border-radius: 20px; display: flex; align-items: center; padding: 40px; color: white;">
                     <div>
-                        <span style="background: #E50914; padding: 5px 12px; border-radius: 4px; font-weight: bold; font-size: 14px;">TOP #{i+1}</span>
-                        <h1 style="font-size: 45px; margin: 15px 0; font-weight: 800;">{tit}</h1>
-                        <p style="max-width: 650px; font-size: 18px; line-height: 1.5; opacity: 0.9;">{resumen_banner}</p>
+                        <span style="background: #E50914; padding: 5px 12px; border-radius: 4px; font-weight: bold;">TOP #{i+1}</span>
+                        <h1 style="font-size: 45px; margin: 15px 0;">{tit}</h1>
+                        <p style="max-width: 650px; font-size: 18px;">{res}</p>
                     </div>
                 </div>
             </a>
         </div>"""
-    carousel_js = f"""<div class="slideshow-container">{slides_html}</div><script>var slideIndex = 0; function showSlides() {{ var slides = document.getElementsByClassName("mySlides"); for (var i = 0; i < slides.length; i++) {{ slides[i].style.display = "none"; }} slideIndex++; if (slideIndex > slides.length) {{slideIndex = 1}} slides[slideIndex-1].style.display = "block"; setTimeout(showSlides, 5000); }} showSlides();</script>"""
-    components.html(carousel_js, height=430)
+    components.html(f'<div class="slideshow-container">{slides}</div><script>var slideIndex = 0; function showSlides() {{ var slides = document.getElementsByClassName("mySlides"); for (var i = 0; i < slides.length; i++) {{ slides[i].style.display = "none"; }} slideIndex++; if (slideIndex > slides.length) {{slideIndex = 1}} slides[slideIndex-1].style.display = "block"; setTimeout(showSlides, 5000); }} showSlides();</script>', height=430)
 
 busqueda = st.text_input("", placeholder="Busca tu película favorita aquí...")
 
-if solo_favs and st.session_state.usuario:
-    res = st.session_state.favoritos
+# Lógica de datos
+if solo_favs:
+    resultados = st.session_state.favoritos
 else:
-    params = {"sort_by": "popularity.desc", "vote_average.gte": min_rating}
-    res = obtener_datos(f"search/{tipo_api}", {"query": busqueda}) if busqueda else obtener_datos(f"discover/{tipo_api}", params)
+    todos_gen = ",".join(menu_sel + humor_sel)
+    params = {"sort_by": "popularity.desc", "vote_average.gte": min_rating, "with_genres": todos_gen}
+    if p_sel: params["with_watch_providers"] = "|".join(map(str, p_sel)); params["watch_region"] = "ES"
+    resultados = obtener_datos(f"search/{tipo_api}", {"query": busqueda}) if busqueda else obtener_datos(f"discover/{tipo_api}", params)
 
-if res:
+if resultados:
     st.markdown("---")
     cols = st.columns(4)
-    for i, item in enumerate(res[:12]):
+    for i, item in enumerate(resultados[:12]):
         with cols[i % 4]:
             t_item = item.get('title') or item.get('name')
             tra, provs, url_f = obtener_detalles_extras(item['id'], tipo_api, t_item)
             if item.get('poster_path'):
                 st.markdown(f'<a href="{url_f}" target="_blank"><img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;"></a>', unsafe_allow_html=True)
             
-            with st.container(height=340, border=False):
+            with st.container(height=360, border=False):
                 st.markdown(f"**{t_item}**")
                 
                 if st.session_state.usuario:
                     es_fav = any(f['id'] == item['id'] for f in st.session_state.favoritos)
-                    btn_txt = "❤️ Quitar" if es_fav else "🤍 Guardar"
-                    if st.button(btn_txt, key=f"fav_{item['id']}"):
+                    if st.button("❤️ Quitar" if es_fav else "🤍 Guardar", key=f"f_{item['id']}"):
                         if es_fav: st.session_state.favoritos = [f for f in st.session_state.favoritos if f['id'] != item['id']]
                         else: st.session_state.favoritos.append(item)
                         st.rerun()
                 
+                # Logos de plataformas restaurados
+                if provs:
+                    html_p = '<div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px;">'
+                    for p in provs[:4]: html_p += f'<img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;">'
+                    st.markdown(html_p + '</div>', unsafe_allow_html=True)
+                
                 if tra:
-                    with st.expander("🎬 VER TRÁILER"): st.video(tra)
+                    with st.expander("🎬 TRÁILER"): st.video(tra)
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "Sin descripción.")}</div>', unsafe_allow_html=True)
+
