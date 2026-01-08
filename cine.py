@@ -17,50 +17,45 @@ st.markdown("""
         html, body, [class*="st-"] { font-family: sans-serif !important; }
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
-       /* 1. LIMPIEZA DE ICONOS (Sin romper botones de login) */
-        /* Solo ocultamos el texto del error, no el botón completo */
-        .st-emotion-cache-ue6h4q, span[data-testid="stIconMaterial"] {
-            font-size: 0 !important;
-            line-height: 0 !important;
-            color: transparent !important;
+      /* 1. ELIMINAR EL TEXTO DEL ERROR EN TODA LA APP */
+        [data-testid="stIconMaterial"] {
             display: none !important;
         }
 
-        /* 2. ESTILO EXCLUSIVO PARA EL EXPANDER DE TRÁILER (Azul Claro) */
+        /* 2. LIMPIAR EL EXPANDER (Sin cajas dobles ni colores neón) */
         div[data-testid="stExpander"] {
-            border: 1px solid #00fbff !important; /* Azul claro */
-            background-color: rgba(0, 251, 255, 0.03) !important;
-            border-radius: 8px !important;
+            border: none !important;
+            background: transparent !important;
+            box-shadow: none !important;
         }
 
         div[data-testid="stExpander"] details summary {
-            list-style: none !important;
-            padding: 8px !important;
             display: flex !important;
-            justify-content: center !important;
+            align-items: center;
+            list-style: none !important;
+            font-size: 0 !important; /* Mata el texto "keyboard_arrow" */
         }
 
+        /* 3. PONER UNA FLECHA SIMPLE (Como pediste) */
+        div[data-testid="stExpander"] details summary::after {
+            content: " ▼"; /* Una flecha de texto estándar */
+            font-size: 12px !important;
+            color: #bbbbbb;
+            margin-left: auto;
+        }
+
+        /* 4. TEXTO DEL BOTÓN */
         div[data-testid="stExpander"] details summary p {
-            font-size: 0.85rem !important;
-            color: #00fbff !important; /* Texto Azul */
-            font-weight: bold !important;
-            text-transform: uppercase !important;
+            font-size: 14px !important;
+            color: white !important;
             margin: 0 !important;
         }
 
-        /* 3. RESTAURAR BOTONES DE LA SIDEBAR (Login/Filtros) */
-        /* Esto asegura que los botones del formulario sean visibles y rojos como los tenías */
-        section[data-testid="stSidebar"] button {
+        /* 5. RESTAURAR BOTONES DE LOGIN (Sidebar) */
+        .stSidebar [data-testid="stBaseButton-secondary"] {
+            display: inline-flex !important;
             background-color: #E50914 !important;
-            color: white !important;
-            display: inline-flex !important; /* Asegura que no sea invisible */
-            opacity: 1 !important;
-            visibility: visible !important;
-            width: 100% !important;
         }
-
-        /* Quitar flechas molestas solo en el expander */
-        div[data-testid="stExpander"] svg { display: none !important; }
         
         /* Ajuste de Botones y Cartelera */
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
@@ -232,6 +227,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
