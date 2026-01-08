@@ -230,11 +230,11 @@ if resultados:
                         else: st.session_state.favoritos.append(item)
                         st.rerun()
                 
-                # PLATAFORMAS
+                # ICONOS PREMIUM CLICABLES
                 if provs:
-                    h_p = '<div style="display: flex; gap: 5px; margin-top: 5px; margin-bottom: 5px;">'
+                    h_p = '<div style="display: flex; gap: 8px; margin-top: 5px; margin-bottom: 5px;">'
                     for p in provs[:4]:
-                        h_p += f'<a href="{link_p}" target="_blank"><img src="{LOGO_URL}{p["logo_path"]}" width="26" style="border-radius:5px;"></a>'
+                        h_p += f'<a href="{link_p}" target="_blank"><img src="{LOGO_URL}{p["logo_path"]}" width="30" style="border-radius:5px;" title="{p["provider_name"]}"></a>'
                     h_p += '</div>'
                     st.markdown(h_p, unsafe_allow_html=True)
                 
@@ -252,6 +252,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
