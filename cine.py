@@ -199,12 +199,13 @@ if resultados:
             tit_i = item.get('title') or item.get('name')
             tra, provs, link_p = obtener_detalles_completos(item['id'], tipo_api, tit_i)
             # Clic en la imagen redirige al link_final (Plataforma directa)
-        if item.get('poster_path'):
-        st.markdown(f'''
-        <a href="{link_p}" target="_blank">
-            <img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;">
-        </a>
-    ''', unsafe_allow_html=True)
+       # Clic en la imagen redirige al link_final (Plataforma directa)
+            if item.get('poster_path'):
+                st.markdown(f'''
+                    <a href="{link_p}" target="_blank">
+                        <img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;">
+                    </a>
+                ''', unsafe_allow_html=True)
             with st.container(height=380, border=False):
                 st.markdown(f"**{tit_i}**")
                 if st.session_state.usuario:
@@ -224,6 +225,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
