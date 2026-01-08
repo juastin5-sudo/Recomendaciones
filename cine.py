@@ -98,20 +98,21 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
                 trailer = f"https://www.youtube.com/watch?v={v['key']}"
                 break
         
-        # 2. Filtrar solo plataformas Premium
+        # 2. Filtrar proveedores Premium
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
         
-        # Lista de IDs o nombres que quieres mostrar (Premium)
-        premium_names = ["Netflix", "Disney Plus", "HBO Max", "Amazon Prime Video", "Apple TV Plus", "Crunchyroll"]
+        # Lista de apps Premium que quieres mostrar
+        premium_names = ["Netflix", "Disney Plus", "HBO Max", "Max", "Amazon Prime Video", "Apple TV Plus", "Crunchyroll", "SkyShowtime"]
         providers_premium = [p for p in providers if p['provider_name'] in premium_names]
         
-        # 3. LINK DIRECTO: Si hay proveedores, intentamos ir a la búsqueda directa de la plataforma
-        if providers_premium:
-            plataforma = providers_premium[0]['provider_name']
-            link_ver = f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+en+{plataforma.replace(' ', '+')}"
-        else:
-            link_ver = f"https://www.google.com/search?q=donde+ver+{titulo_item.replace(' ', '+')}+online"
+        # 3. ENLACE DIRECTO (El que tenías antes que funcionaba)
+        # Priorizamos el link de la región que redirige a la plataforma
+        link_ver = region.get('link') 
+        
+        # Si por alguna razón no hay link, usamos Google como respaldo
+        if not link_ver:
+            link_ver = f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
             
         return trailer, providers_premium, link_ver
     except: 
@@ -252,6 +253,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
