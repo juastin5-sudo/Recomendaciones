@@ -19,6 +19,15 @@ st.markdown("""
         /* 1. Bloquear Sidebar: ocultar botones de abrir/cerrar */
         [data-testid="sidebar-close"], [data-testid="stSidebarCollapseButton"] {
             display: none !important;
+            /* ELIMINAR EL BOTÓN DE CERRAR DE LA BARRA LATERAL */
+        [data-testid="sidebar-close"] {
+            display: none !important;
+        }
+        
+        /* ELIMINAR EL BOTÓN DE ABRIR (POR SI ACASO) */
+        [data-testid="stSidebarCollapseButton"] {
+            display: none !important;
+        }
     /* 1. ELIMINAR EL TEXTO DEL ERROR EN TODA LA APP */
         [data-testid="stIconMaterial"] {
             display: none !important;
@@ -229,6 +238,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
