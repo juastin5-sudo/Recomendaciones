@@ -18,10 +18,24 @@ st.markdown("""
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
         /* ELIMINAR KEYBOARD_ARROW Y ICONOS DEL EXPANDER POR COMPLETO */
-        div[data-testid="stExpander"] details summary svg { display: none !important; }
-        div[data-testid="stExpander"] details summary p { color: white !important; font-weight: bold !important; }
-        div[data-testid="stExpander"] details summary { list-style: none !important; }
-        div[data-testid="stExpander"] details summary::-webkit-details-marker { display: none !important; }
+        div[data-testid="stExpander"] details summary svg { 
+            display: none !important; 
+        }
+        div[data-testid="stExpander"] details summary p { 
+            color: white !important; 
+            font-weight: bold !important; 
+        }
+        /* Esta es la clave: ocultar cualquier texto que no esté dentro de un párrafo (el icono) */
+        div[data-testid="stExpander"] details summary { 
+            list-style: none !important;
+            font-size: 0 !important; /* Hace que el texto del icono desaparezca */
+        }
+        div[data-testid="stExpander"] details summary > * { 
+            font-size: 1rem !important; /* Devuelve el tamaño al texto del título */
+        }
+        div[data-testid="stExpander"] details summary::-webkit-details-marker { 
+            display: none !important; 
+        }
         
         /* Ajuste de Botones y Cartelera */
         .img-clicable:hover { transform: scale(1.02); transition: 0.3s; cursor: pointer; }
@@ -193,3 +207,4 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
