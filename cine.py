@@ -12,10 +12,7 @@ conn = st.connection("gsheets", type=GSheetsConnection)
 # --- ESTILOS CSS (ELIMINACIÓN RADICAL DE ERRORES) ---
 st.markdown("""
     <style>
-        /* Tipografía Sans Serif Original */
-        html, body, [class*="st-"] { font-family: sans-serif !important; }
-        .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
-
+       
         /* 1. Bloquear Sidebar: ocultar botones de abrir/cerrar */
         [data-testid="sidebar-close"], [data-testid="stSidebarCollapseButton"] {
             display: none !important;
@@ -232,6 +229,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
