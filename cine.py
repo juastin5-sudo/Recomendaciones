@@ -1,10 +1,9 @@
 import streamlit as st
 from streamlit_gsheets import GSheetsConnection
 import pandas as pd
-import requests
-import streamlit.components.v1 as components
+# ... (tus otros imports)
 
-# 1. Ocultar barra lateral por defecto y configurar página
+# ASEGÚRATE DE QUE ESTO NO TENGA ESPACIOS AL INICIO
 st.set_page_config(
     page_title="Juastin Stream Pro", 
     page_icon="🎬", 
@@ -12,33 +11,20 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# 2. CSS para limpiar errores visuales, tipografía y estilo del botón lateral
 st.markdown("""
 <style>
-    /* 1. Ocultar el texto keyboard_arrow y cualquier icono interno del expander */
-    [data-testid="stExpanderIcon"], 
-    summary svg, 
-    .stExpander svg,
-    summary span {
-        display: none !important;
-        visibility: hidden !important;
-    }
+    /* 1. Importar la fuente para que cargue el icono y no el texto */
+    @import url('https://fonts.googleapis.com/icon?family=Material+Icons');
 
-    /* 2. Forzar que el texto del botón se vea limpio */
-    summary p {
-        margin: 0 !important;
-        font-weight: bold !important;
-        color: white !important;
-    }
-
-    /* 3. Estilo del botón de la barra lateral (la flecha para mostrar/ocultar) */
+    /* 2. Arreglar el botón de la barra lateral */
     [data-testid="stSidebarCollapsedControl"] {
-        background-color: #E50914 !important; /* Rojo Netflix */
-        border-radius: 0 10px 10px 0 !important;
+        font-family: 'Material Icons' !important;
+        background-color: #E50914 !important;
         color: white !important;
+        border-radius: 0 10px 10px 0 !important;
     }
-    
-    /* 4. Asegurar tipografía Sans-Serif */
+
+    /* 3. Forzar tipografía Sans Serif */
     html, body, [class*="st-"] {
         font-family: sans-serif !important;
     }
@@ -284,6 +270,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
