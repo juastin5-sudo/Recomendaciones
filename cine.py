@@ -32,14 +32,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
                    
-        /* 2. Recuperamos solo tu texto "VER TRÁILER" */
-        div[data-testid="stExpander"] details summary p {
-            font-size: 14px !important;
-            color: white !important; /* Puedes cambiar 'white' por el color que prefieras */
-            visibility: visible !important;
-            display: block !important;
-        }
-
+    
         /* 3. Eliminamos el icono SVG que causa el desplazamiento */
         div[data-testid="stExpander"] details summary svg {
             display: none !important;
@@ -263,6 +256,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
