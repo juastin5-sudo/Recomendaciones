@@ -31,15 +31,7 @@ st.markdown("""
     }
 </style>
 """, unsafe_allow_html=True)
-               /* 3. Forzamos que SOLO tu texto "VER TRÁILER" sea visible y limpio */
-        div[data-testid="stExpander"] details summary p {
-            font-size: 14px !important; /* Tu texto recupera su tamaño */
-            color: white !important;
-            visibility: visible !important;
-            display: block !important;
-            margin: 0 !important;
-            padding: 0 !important;
-      
+                   
         /* 2. Recuperamos solo tu texto "VER TRÁILER" */
         div[data-testid="stExpander"] details summary p {
             font-size: 14px !important;
@@ -271,6 +263,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
