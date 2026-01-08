@@ -15,32 +15,32 @@ st.set_page_config(
 # 2. CSS para limpiar errores visuales, tipografía y estilo del botón lateral
 st.markdown("""
 <style>
-    /* Tipografía Sans Serif limpia para toda la app */
-    html, body, [class*="st-"], .stMarkdown {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
+    /* 1. Ocultar el texto keyboard_arrow y cualquier icono interno del expander */
+    [data-testid="stExpanderIcon"], 
+    summary svg, 
+    .stExpander svg,
+    summary span {
+        display: none !important;
+        visibility: hidden !important;
     }
 
-    /* ELIMINAR EL ERROR 'keyboard_arrow' DEFINITIVAMENTE */
-    summary svg, 
-    span[data-testid="stExpanderIcon"], 
-    .stExpander svg,
-    [data-testid="stExpanderIcon"] {
-        display: none !important;
+    /* 2. Forzar que el texto del botón se vea limpio */
+    summary p {
+        margin: 0 !important;
+        font-weight: bold !important;
+        color: white !important;
+    }
+
+    /* 3. Estilo del botón de la barra lateral (la flecha para mostrar/ocultar) */
+    [data-testid="stSidebarCollapsedControl"] {
+        background-color: #E50914 !important; /* Rojo Netflix */
+        border-radius: 0 10px 10px 0 !important;
+        color: white !important;
     }
     
-    /* Estilo para el botón de la barra lateral cuando está oculta */
-    [data-testid="stSidebarCollapsedControl"] {
-        background-color: rgba(229, 9, 20, 0.9); /* Rojo Netflix */
-        border-radius: 0 10px 10px 0;
-        color: white;
-        top: 10px;
-    }
-
-    /* Ajuste para los contenedores de tráiler */
-    .stExpander {
-        border: 1px solid rgba(255,255,255,0.1) !important;
-        border-radius: 10px !important;
-        background-color: rgba(255,255,255,0.05) !important;
+    /* 4. Asegurar tipografía Sans-Serif */
+    html, body, [class*="st-"] {
+        font-family: sans-serif !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -284,6 +284,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
