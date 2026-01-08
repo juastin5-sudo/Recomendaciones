@@ -64,19 +64,14 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
     url = f"{BASE_URL}/{tipo}/{item_id}"
     try:
         res = requests.get(url, params=params).json()
-        
-        # Trailer
         trailer = None
         for v in res.get('videos', {}).get('results', []):
             if v['type'] in ['Trailer', 'Opening'] and v['site'] == 'YouTube':
                 trailer = f"https://www.youtube.com/watch?v={v['key']}"
                 break
         
-        # Enlace Directo a Plataforma (JustWatch Link)
         region = res.get('watch/providers', {}).get('results', {}).get('ES', {})
         providers = region.get('flatrate', [])
-        
-        # Filtro de iconos únicos
         vistos = set()
         providers_unicos = []
         for p in providers:
@@ -84,10 +79,8 @@ def obtener_detalles_completos(item_id, tipo, titulo_item):
                 providers_unicos.append(p)
                 vistos.add(p['provider_name'])
         
-        # PRIORIDAD: Link de JustWatch (abre la plataforma), si no hay, Google.
-        link_final = region.get('link') if providers else f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+en+streaming"
-        
-        return trailer, providers_unicos, link_final
+        link_ver = region.get('link') if providers else f"https://www.google.com/search?q=ver+{titulo_item.replace(' ', '+')}+online"
+        return trailer, providers_unicos, link_ver
     except:
         return None, [], f"https://www.google.com/search?q={titulo_item}"
 
@@ -198,14 +191,9 @@ if resultados:
         with cols[i % 4]:
             tit_i = item.get('title') or item.get('name')
             tra, provs, link_p = obtener_detalles_completos(item['id'], tipo_api, tit_i)
-            # Clic en la imagen redirige al link_final (Plataforma directa)
-       # Clic en la imagen redirige al link_final (Plataforma directa)
             if item.get('poster_path'):
-                st.markdown(f'''
-                    <a href="{link_p}" target="_blank">
-                        <img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;">
-                    </a>
-                ''', unsafe_allow_html=True)
+                st.markdown(f'<a href="{link_p}" target="_blank"><img src="{POSTER_URL}{item["poster_path"]}" class="img-clicable" style="width:100%; border-radius:10px;"></a>', unsafe_allow_html=True)
+            
             with st.container(height=380, border=False):
                 st.markdown(f"**{tit_i}**")
                 if st.session_state.usuario:
@@ -225,7 +213,3 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
-
-
-
-
