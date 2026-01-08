@@ -17,21 +17,38 @@ st.markdown("""
         html, body, [class*="st-"] { font-family: sans-serif !important; }
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
-       /* ELIMINAR TEXTO DE ICONOS EN EXPANDERS */
+       /* DISEÑO PREMIUM PARA EL BOTÓN DE TRÁILER */
+        div[data-testid="stExpander"] {
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 8px !important;
+            background-color: rgba(255, 255, 255, 0.05) !important;
+            transition: all 0.3s ease;
+        }
+
+        div[data-testid="stExpander"]:hover {
+            border-color: #E50914 !important; /* Rojo Netflix al pasar el mouse */
+            background-color: rgba(229, 9, 20, 0.1) !important;
+        }
+
         div[data-testid="stExpander"] details summary {
             list-style: none !important;
-            font-size: 0 !important; /* Oculta el texto del icono */
-            color: transparent !important; /* Asegura que no se vea el texto */
+            font-size: 0 !important; 
+            padding: 10px !important;
+            display: flex !important;
+            justify-content: center !important; /* Centra el texto */
         }
 
         div[data-testid="stExpander"] details summary p {
-            font-size: 1rem !important; /* Recupera el tamaño para el título "VER TRÁILER" */
-            color: white !important;
+            font-size: 0.85rem !important; 
+            color: #ffffff !important;
+            text-transform: uppercase !important; /* Estilo botón */
+            letter-spacing: 1px !important;
             margin: 0 !important;
         }
 
-        /* Ocultar el SVG original si aún aparece */
-        div[data-testid="stExpander"] svg {
+        /* Quitar la flecha y cualquier texto de icono residual */
+        div[data-testid="stExpander"] svg, 
+        div[data-testid="stExpander"] details summary::marker {
             display: none !important;
         }
         /* Ajuste de Botones y Cartelera */
@@ -204,5 +221,6 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
