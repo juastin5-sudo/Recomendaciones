@@ -5,21 +5,27 @@ import requests
 import streamlit.components.v1 as components
 
 # 1. Configuración de la página
-st.set_page_config(page_title="Merida Stream Pro", page_icon="🎬", layout="wide", initial_sidebar_state="expanded")
-# --- CONEXIÓN A BASE DE DATOS ---
-conn = st.connection("gsheets", type=GSheetsConnection)
+# 1. Cambia tu primera línea por esta (esto la oculta al cargar la página)
+st.set_page_config(
+    page_title="Juastin Stream Pro", 
+    page_icon="🎬", 
+    layout="wide", 
+    initial_sidebar_state="collapsed"
+)
 
-# --- ESTILOS CSS (ELIMINACIÓN RADICAL DE ERRORES) ---
+# 2. Agrega este bloque de CSS dentro de tu sección de estilos (st.markdown) 
+# Esto hace que el botón para abrirla sea más visible y elegante
 st.markdown("""
     <style>
-       
-        /* 1. Bloquear Sidebar: ocultar botones de abrir/cerrar */
-        [data-testid="sidebar-close"], [data-testid="stSidebarCollapseButton"] {
-            display: none !important;
-            /* ELIMINAR EL BOTÓN DE CERRAR DE LA BARRA LATERAL */
-        [data-testid="sidebar-close"] {
-            display: none !important;
+        /* Estilo para el botón de la barra lateral cuando está oculta */
+        [data-testid="stSidebarCollapsedControl"] {
+            background-color: rgba(229, 9, 20, 0.8); /* Rojo Netflix */
+            border-radius: 0 10px 10px 0;
+            color: white;
+            padding: 5px;
         }
+    </style>
+""", unsafe_allow_html=True)
                /* 3. Forzamos que SOLO tu texto "VER TRÁILER" sea visible y limpio */
         div[data-testid="stExpander"] details summary p {
             font-size: 14px !important; /* Tu texto recupera su tamaño */
@@ -271,6 +277,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
