@@ -15,11 +15,7 @@ st.set_page_config(
 # 2. Bloque de CSS para arreglar la letra, ocultar errores y estilizar el botón lateral
 st.markdown("""
 <style>
-    /* Tipografía Sans Serif limpia para toda la app */
-    html, body, [class*="st-"], .stMarkdown {
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif !important;
-    }
-
+   
     /* ELIMINAR EL ERROR 'keyboard_arrow' DEFINITIVAMENTE */
     summary svg, 
     span[data-testid="stExpanderIcon"], 
@@ -52,18 +48,7 @@ st.markdown("""
             display: block !important;
             margin: 0 !important;
             padding: 0 !important;
-        }
-
-        /* 4. Bloquear Sidebar (Como pediste, para que no se cierre) */
-        [data-testid="sidebar-close"], [data-testid="stSidebarCollapseButton"] {
-            display: none !important;
-        }
-        /* ELIMINAR EL BOTÓN DE ABRIR (POR SI ACASO) */
-        [data-testid="stSidebarCollapseButton"] {
-            display: none !important;
-        }
-
-
+      
         /* 2. Recuperamos solo tu texto "VER TRÁILER" */
         div[data-testid="stExpander"] details summary p {
             font-size: 14px !important;
@@ -295,6 +280,7 @@ if resultados:
                     res_info = "Sin descripción disponible."
                 
                 st.markdown(f'<div class="resumen-inferior">{res_info}</div>', unsafe_allow_html=True)
+
 
 
 
