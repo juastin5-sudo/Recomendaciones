@@ -17,38 +17,42 @@ st.markdown("""
         html, body, [class*="st-"] { font-family: sans-serif !important; }
         .stApp { background: linear-gradient(135deg, #050505 0%, #0a0a1a 50%, #150a1e 100%); color: white; }
         
-       /* DISEÑO PREMIUM PARA EL BOTÓN DE TRÁILER */
-        div[data-testid="stExpander"] {
-            border: 1px solid rgba(255, 255, 255, 0.1) !important;
-            border-radius: 8px !important;
-            background-color: rgba(255, 255, 255, 0.05) !important;
-            transition: all 0.3s ease;
+       /* 1. ELIMINACIÓN TOTAL DE TEXTO DE ICONOS EN TODA LA APP */
+        /* Esto limpia los nombres de iconos que aparecen arriba y en botones */
+        span[data-testid="stIconMaterial"], 
+        .st-emotion-cache-ue6h4q, 
+        summary svg {
+            display: none !important;
         }
 
-        div[data-testid="stExpander"]:hover {
-            border-color: #E50914 !important; /* Rojo Netflix al pasar el mouse */
-            background-color: rgba(229, 9, 20, 0.1) !important;
+        /* 2. ESTILO TIPO BOTÓN PARA EL EXPANDER (MÁS ESTÉTICO) */
+        div[data-testid="stExpander"] {
+            border: 1px solid rgba(255, 255, 255, 0.1) !important;
+            border-radius: 4px !important;
+            background-color: transparent !important;
         }
 
         div[data-testid="stExpander"] details summary {
             list-style: none !important;
+            padding: 5px !important;
+            /* Forzamos que el texto del icono sea invisible si el display:none falla */
             font-size: 0 !important; 
-            padding: 10px !important;
-            display: flex !important;
-            justify-content: center !important; /* Centra el texto */
+            color: transparent !important;
         }
 
+        /* 3. RECUPERAR SOLO EL TEXTO "VER TRÁILER" */
         div[data-testid="stExpander"] details summary p {
-            font-size: 0.85rem !important; 
-            color: #ffffff !important;
-            text-transform: uppercase !important; /* Estilo botón */
-            letter-spacing: 1px !important;
+            font-size: 0.8rem !important;
+            color: #E50914 !important; /* Rojo para que combine con tu UI */
+            font-weight: bold !important;
+            text-transform: uppercase !important;
             margin: 0 !important;
+            width: 100%;
+            text-align: center; /* Centrado se ve más premium */
         }
 
-        /* Quitar la flecha y cualquier texto de icono residual */
-        div[data-testid="stExpander"] svg, 
-        div[data-testid="stExpander"] details summary::marker {
+        /* 4. ELIMINAR FLECHAS NATIVAS */
+        div[data-testid="stExpander"] details summary::-webkit-details-marker {
             display: none !important;
         }
         /* Ajuste de Botones y Cartelera */
@@ -221,6 +225,7 @@ if resultados:
                 
                 st.markdown(f'<div class="valoracion-container">⭐ {item["vote_average"]}</div>', unsafe_allow_html=True)
                 st.markdown(f'<div class="resumen-inferior">{item.get("overview", "...")}</div>', unsafe_allow_html=True)
+
 
 
 
